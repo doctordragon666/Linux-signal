@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <unistd.h>
 #include <stdio.h>
 
 int main(void)
@@ -19,3 +20,4 @@ int main(void)
 
     return 0;
 }
+//不使用信号量不会父子进程会同时in,out

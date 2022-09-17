@@ -6,23 +6,28 @@
 #include <unistd.h>
 #include <stdio.h>
 
+const int SEM_VALUE = 1;//信号量指定的初始值
+
 #if defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)
 #else
 union semun
 {
-    int val;
+    int val;//setval命令要设置的值
     struct semid_ds *buf;
     unsigned short int *array;
     struct seminfo *__buf;
 };
 #endif
 
+/// @brief 初始化信号量
+/// @param semid 信号量标识符
+/// @return 错误信息
 static int sem_initial(int semid)
 {
     int ret;
 
     union semun semun;
-    semun.val = 1;
+    semun.val = SEM_VALUE;
     ret = semctl(semid, 0, SETVAL, semun);
     if (ret == -1)
     {
@@ -32,14 +37,17 @@ static int sem_initial(int semid)
     return ret;
 }
 
+/// @brief 信号量p操作
+/// @param semid 
+/// @return 
 static int sem_p(int semid)
 {
     int ret;
 
     struct sembuf sembuf;
-    sembuf.sem_op = -1;
-    sembuf.sem_num = 0;
-    sembuf.sem_flg = SEM_UNDO;
+    sembuf.sem_op = -1;//表示p操作
+    sembuf.sem_num = 0;//编号，一个编号0
+    sembuf.sem_flg = SEM_UNDO;//进程终止，不释放信号量
     ret = semop(semid, &sembuf, 1);
     if (ret == -1)
     {
@@ -49,6 +57,9 @@ static int sem_p(int semid)
     return ret;
 }
 
+/// @brief 信号量v操作
+/// @param semid 
+/// @return 
 static int sem_v(int semid)
 {
     int ret;
@@ -81,15 +92,13 @@ int main(int argc, char *argv[])
     }
 
     /* 初始化信号量 */
-    if (argc > 1)
+    ret = sem_initial(semid);
+    if (ret == -1)
     {
-        ret = sem_initial(semid);
-        if (ret == -1)
-        {
-            exit(1);
-        }
+        exit(1);
     }
 
+    int pid = fork();
     for (i = 0; i < 5; i++)
     {
 
@@ -116,3 +125,4 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+//使用信号量不会父进程执行完in,out，再执行子进程
