@@ -1,7 +1,10 @@
+//5秒后发信号触发
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <time.h>
+#include <unistd.h>
 
 int wakeflag = 0;
 
@@ -22,7 +25,7 @@ int main(void)
 	
 	printf("time =%ld\n", time((time_t*)0));
 
-	ret = alarm(5);
+	ret = alarm(5);//5秒后发送信号
 	if (ret == -1) {
 		printf("alarm error!\n");
 		exit(1);

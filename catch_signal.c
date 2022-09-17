@@ -55,17 +55,16 @@ void mutil_sigaction()
 	act.sa_handler = loophandle;
 	sigemptyset(&act.sa_mask);
 	act.sa_flags = 0;
-	sigaction(SIGINT, &act, 0);
+	sigaction(SIGINT, &act, 0);//关联终端中断
 
 	sigset_t proc_sig_msk, old_mask;
 	sigemptyset(&proc_sig_msk);
 	sigaddset(&proc_sig_msk, SIGINT);
 
-	sigprocmask(SIG_BLOCK, &proc_sig_msk, &old_mask);
+	sigprocmask(SIG_BLOCK, &proc_sig_msk, &old_mask);//添加到老屏蔽集
 	sleep(5);
 	printf("had delete SIGINT from process sig mask\n");
-	sigprocmask(SIG_UNBLOCK, &proc_sig_msk, &old_mask);
-
+	sigprocmask(SIG_UNBLOCK, &proc_sig_msk, &old_mask);//从新屏蔽中删除老屏蔽集中包含的信号
 }
 
 int main(void)
